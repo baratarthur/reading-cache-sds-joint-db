@@ -26,11 +26,11 @@ libs.adaptation.AdaptationLyfecicle, libs.krabs.MetricsStore, time.TimeUnix time
     MetricsStore ms
     IDC metricsStoreComponent
     LoadedComponents repoComponents[] = new LoadedComponents[](
-        loader.load("repositories/cache/PostsRepository.o"),
-        loader.load("repositories/cache/PostsRepository.proxy.replicate.strong.o"),
-        loader.load("repositories/cache/PostsRepository.proxy.replicate.weak.o"),
-        loader.load("repositories/cache/PostsRepository.proxy.fragment.strong.o"),
-        loader.load("repositories/cache/PostsRepository.proxy.fragment.weak.o")
+        loader.load("repositories/posts/PostsRepository.o"),
+        loader.load("repositories/posts/PostsRepository.proxy.replicate.strong.o"),
+        loader.load("repositories/posts/PostsRepository.proxy.replicate.weak.o"),
+        loader.load("repositories/posts/PostsRepository.proxy.fragment.strong.o"),
+        loader.load("repositories/posts/PostsRepository.proxy.fragment.weak.o")
     )
     String names[] = new String[](
         new String("PostsRepository"),

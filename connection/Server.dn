@@ -21,10 +21,9 @@ data LatencyCheckDTO {
 component provides Server(Destructor) requires net.TCPSocket, net.TCPServerSocket, libs.utils.Logger logger, data.IntUtil iu,
 composition.Adapt adapter, composition.RecursiveLoader loader, repositories.posts.PostsRepository, libs.network.http.HTTPUtil httpUtil,
 data.StringUtil su, data.json.JSONEncoder je, data.json.JSONParser jsonParser, time.Calendar ic, libs.krabs.LatencyStore ls, libs.krabs.RemotesHandler,
-libs.adaptation.AdaptationLyfecicle, libs.krabs.MetricsStore, time.TimeUnix timeUnix {
+libs.adaptation.AdaptationLyfecicle, libs.krabs.MetricsStore, time.TimeUnix timeUnix, Service {
     PostsRepository repo
     MetricsStore ms
-    IDC metricsStoreComponent
     LoadedComponents repoComponents[] = new LoadedComponents[](
         loader.load("repositories/posts/PostsRepository.o"),
         loader.load("repositories/posts/PostsRepository.proxy.replicate.strong.o"),
@@ -77,9 +76,9 @@ libs.adaptation.AdaptationLyfecicle, libs.krabs.MetricsStore, time.TimeUnix time
 
     void initRepo() {
         LoadedComponents msLoad = loader.load("libs/krabs/MetricsStore.o")
-        metricsStoreComponent = msLoad.mainComponent
-        ms = new MetricsStore() from metricsStoreComponent
-        for(int i = 0; i < repoComponents.arrayLength; i++) repoComponents[i].mainComponent.wire("libs.krabs.MetricsStore", metricsStoreComponent, "libs.krabs.MetricsStore")
+        ms = new MetricsStore() from msLoad.mainComponent
+        msLoad.mainComponent.callInterface(ms, "Service", null, Service.[start()], null)
+        for(int i = 0; i < repoComponents.arrayLength; i++) repoComponents[i].mainComponent.wire("libs.krabs.MetricsStore", msLoad.mainComponent, "libs.krabs.MetricsStore")
         repo = new PostsRepository() from repoComponents[lastComponentIndex].mainComponent
     }
     
@@ -258,7 +257,7 @@ libs.adaptation.AdaptationLyfecicle, libs.krabs.MetricsStore, time.TimeUnix time
         char currentState[] = je.jsonFromArray(repo.getPosts())
         logger.info("Current posts state: $(iu.makeString(currentState.arrayLength))")
 
-        adapter.adaptObject(repoComponents[lastComponentIndex].mainComponent, repo, repoComponents[option].mainComponent, "repositories.cache.PostsRepository")
+        adapter.adaptObject(repoComponents[lastComponentIndex].mainComponent, repo, repoComponents[option].mainComponent, "repositories.posts.PostsRepository")
         lastComponentIndex = option
         
         if (option != 0) {

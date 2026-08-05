@@ -11,14 +11,6 @@ data RequestMetric {
 }
 
 interface MetricsStore {
-    transfer RequestMetric requests[]
-    transfer int cacheSize
-    transfer int cacheHit
-    transfer int cacheMiss
-    transfer bool measure
-
-    transfer int deliveredThreadId
-
     int getId()
     void startProcess(store int threadId)
     void hitCache()

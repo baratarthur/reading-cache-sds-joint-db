@@ -1,21 +1,15 @@
 
 const char TAG[] = "[@MetricsStore] - "
 
-component provides MetricsStore(Service) requires libs.utils.Logger logger, data.IntUtil iu, time.Timer timer, data.json.JSONEncoder je,
+component provides MetricsStore requires libs.utils.Logger logger, data.IntUtil iu, time.Timer timer, data.json.JSONEncoder je,
 time.Calendar ic, time.TimeUnix timeUnix {
+    static RequestMetric requests[] = new RequestMetric[]()
+    static int cacheSize = 0
+    static int cacheHit = 0
+    static int cacheMiss = 0
+    static bool measure = false
 
-    void Service:start() {
-        requests = new RequestMetric[]()
-        cacheSize = 0
-        cacheHit = 0
-        cacheMiss = 0
-        measure = false
-
-        deliveredThreadId = 0
-        logger.storeInfo("start called")
-    }
-
-    void Service:stop() {}
+    static int deliveredThreadId = 0
 
     void MetricsStore:hitCache() {
         cacheHit++
@@ -53,21 +47,21 @@ time.Calendar ic, time.TimeUnix timeUnix {
             char log[] = new char[](
                 TAG,
                 "{",
-                "\"cache_size\": \"$(iu.makeString(cacheSize))\",",
                 "\"cacheHits\": \"$(iu.makeString(cacheHit))\",",
                 "\"cacheMiss\": \"$(iu.makeString(cacheMiss))\",",
-                "\"cache_lookup\": \"$(iu.makeString(cacheLookup))\",",
-                "\"database_service\": \"$(iu.makeString(databaseService))\",",
-                "\"cache_update\": \"$(iu.makeString(cacheUpdate))\",",
-                "\"waiting_before_lookup\": \"$(iu.makeString(waitingBeforeLookup))\",",
-                "\"waiting_before_database\": \"$(iu.makeString(waitingBeforeDatabase))\",",
-                "\"waiting_before_update\": \"$(iu.makeString(waitingBeforeUpdate))\",",
+                // "\"cache_lookup\": \"$(iu.makeString(cacheLookup))\",",
+                // "\"database_service\": \"$(iu.makeString(databaseService))\",",
+                // "\"cache_update\": \"$(iu.makeString(cacheUpdate))\",",
+                // "\"waiting_before_lookup\": \"$(iu.makeString(waitingBeforeLookup))\",",
+                // "\"waiting_before_database\": \"$(iu.makeString(waitingBeforeDatabase))\",",
+                // "\"waiting_before_update\": \"$(iu.makeString(waitingBeforeUpdate))\",",
                 "\"total_latency\": \"$(iu.makeString(totalLatency))\"",
                 "}"
             )
             logger.storeInfo(log)
             timer.sleep(1000)
         }
+        logger.storeInfo(je.jsonFromArray(requests))
     }
 
     dec cacheLookupTime() {
